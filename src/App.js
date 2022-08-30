@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import './App.css';
 import CardList from './components/card-list/cardList.component';
@@ -6,6 +6,22 @@ import SearchBox from './components/search-box/searchBox.component';
 
 const App = () => {
   const [searchField, setSearchField] = useState('');
+  const [monsters, setMonsters] = useState([]);
+  const [filteredMonsters, setfilteredMonsters] = useState(monsters);
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then((response) => response.json())
+      .then((users) => setMonsters(users));
+  }, []);
+
+  useEffect(() => {
+    const newFilteredMonsters = monsters.filter((monster) => {
+      return monster.name.toLowerCase().includes(searchField);
+    });
+
+    setfilteredMonsters(newFilteredMonsters);
+  }, [monsters, searchField]);
 
   const onSearchChange = (e) => {
     const searchFieldString = e.target.value.toLowerCase();
@@ -20,8 +36,7 @@ const App = () => {
         placeholder='search monsters'
         className='monsters-search-box'
       />
-
-      {/*<CardList monsters={filteredMonsters} /> */}
+      <CardList monsters={filteredMonsters} />
     </div>
   );
 };
